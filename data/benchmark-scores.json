@@ -1,0 +1,250 @@
+{
+  "models": {
+    "Vicuna": {
+      "name": "Vicuna",
+      "type": "open_source"
+    },
+    "ChatGLM3": {
+      "name": "ChatGLM3", 
+      "type": "open_source"
+    },
+    "Llama2": {
+      "name": "Llama2",
+      "type": "open_source"
+    },
+    "Llama3": {
+      "name": "Llama3",
+      "type": "open_source"
+    },
+    "Llama3.1": {
+      "name": "Llama3.1",
+      "type": "open_source"
+    },
+    "GPT-3.5": {
+      "name": "GPT-3.5",
+      "type": "proprietary"
+    },
+    "GPT-4": {
+      "name": "GPT-4",
+      "type": "proprietary"
+    },
+    "DeepSeek-V3": {
+      "name": "DeepSeek-V3",
+      "type": "open_source"
+    },
+    "PaLM2": {
+      "name": "PaLM2",
+      "type": "proprietary"
+    }
+  },
+  "scores": {
+    "Illegal Activities": {
+      "Vicuna": 0.62,
+      "ChatGLM3": 0.46,
+      "Llama2": 0.22,
+      "Llama3": 0.19,
+      "Llama3.1": 0.16,
+      "GPT-3.5": 0.62,
+      "GPT-4": 0.43,
+      "DeepSeek-V3": 0.58,
+      "PaLM2": 0.46,
+      "Average": 0.42,
+      "Baseline": 0.03
+    },
+    "Hate, Unfairness or Harassment": {
+      "Vicuna": 0.63,
+      "ChatGLM3": 0.52,
+      "Llama2": 0.14,
+      "Llama3": 0.12,
+      "Llama3.1": 0.09,
+      "GPT-3.5": 0.62,
+      "GPT-4": 0.44,
+      "DeepSeek-V3": 0.56,
+      "PaLM2": 0.46,
+      "Average": 0.40,
+      "Baseline": 0.06
+    },
+    "Terrorist Content": {
+      "Vicuna": 0.68,
+      "ChatGLM3": 0.40,
+      "Llama2": 0.16,
+      "Llama3": 0.12,
+      "Llama3.1": 0.09,
+      "GPT-3.5": 0.58,
+      "GPT-4": 0.24,
+      "DeepSeek-V3": 0.56,
+      "PaLM2": 0.48,
+      "Average": 0.37,
+      "Baseline": 0.08
+    },
+    "Disinformation Spread": {
+      "Vicuna": 0.71,
+      "ChatGLM3": 0.64,
+      "Llama2": 0.27,
+      "Llama3": 0.21,
+      "Llama3.1": 0.15,
+      "GPT-3.5": 0.72,
+      "GPT-4": 0.53,
+      "DeepSeek-V3": 0.67,
+      "PaLM2": 0.54,
+      "Average": 0.49,
+      "Baseline": 0.08
+    },
+    "Privacy Breach": {
+      "Vicuna": 0.69,
+      "ChatGLM3": 0.52,
+      "Llama2": 0.21,
+      "Llama3": 0.21,
+      "Llama3.1": 0.16,
+      "GPT-3.5": 0.66,
+      "GPT-4": 0.34,
+      "DeepSeek-V3": 0.54,
+      "PaLM2": 0.51,
+      "Average": 0.43,
+      "Baseline": 0.08
+    },
+    "Physical Harm": {
+      "Vicuna": 0.68,
+      "ChatGLM3": 0.54,
+      "Llama2": 0.19,
+      "Llama3": 0.22,
+      "Llama3.1": 0.19,
+      "GPT-3.5": 0.61,
+      "GPT-4": 0.38,
+      "DeepSeek-V3": 0.62,
+      "PaLM2": 0.38,
+      "Average": 0.42,
+      "Baseline": 0.10
+    },
+    "Malicious Software": {
+      "Vicuna": 0.69,
+      "ChatGLM3": 0.55,
+      "Llama2": 0.30,
+      "Llama3": 0.21,
+      "Llama3.1": 0.19,
+      "GPT-3.5": 0.65,
+      "GPT-4": 0.38,
+      "DeepSeek-V3": 0.70,
+      "PaLM2": 0.55,
+      "Average": 0.47,
+      "Baseline": 0.15
+    },
+    "Safety Filter Bypass": {
+      "Vicuna": 0.72,
+      "ChatGLM3": 0.56,
+      "Llama2": 0.39,
+      "Llama3": 0.33,
+      "Llama3.1": 0.31,
+      "GPT-3.5": 0.69,
+      "GPT-4": 0.66,
+      "DeepSeek-V3": 0.83,
+      "PaLM2": 0.53,
+      "Average": 0.56,
+      "Baseline": 0.26
+    },
+    "Third-party Rights Violation": {
+      "Vicuna": 0.70,
+      "ChatGLM3": 0.55,
+      "Llama2": 0.41,
+      "Llama3": 0.29,
+      "Llama3.1": 0.25,
+      "GPT-3.5": 0.75,
+      "GPT-4": 0.67,
+      "DeepSeek-V3": 0.68,
+      "PaLM2": 0.54,
+      "Average": 0.54,
+      "Baseline": 0.29
+    },
+    "Risky Government Decisions": {
+      "Vicuna": 0.69,
+      "ChatGLM3": 0.61,
+      "Llama2": 0.18,
+      "Llama3": 0.18,
+      "Llama3.1": 0.19,
+      "GPT-3.5": 0.67,
+      "GPT-4": 0.45,
+      "DeepSeek-V3": 0.74,
+      "PaLM2": 0.63,
+      "Average": 0.48,
+      "Baseline": 0.34
+    },
+    "Unauthorized Practice": {
+      "Vicuna": 0.77,
+      "ChatGLM3": 0.66,
+      "Llama2": 0.64,
+      "Llama3": 0.47,
+      "Llama3.1": 0.40,
+      "GPT-3.5": 0.76,
+      "GPT-4": 0.83,
+      "DeepSeek-V3": 0.88,
+      "PaLM2": 0.58,
+      "Average": 0.67,
+      "Baseline": 0.78
+    },
+    "Well-being Infringement": {
+      "Vicuna": 0.78,
+      "ChatGLM3": 0.71,
+      "Llama2": 0.57,
+      "Llama3": 0.41,
+      "Llama3.1": 0.41,
+      "GPT-3.5": 0.78,
+      "GPT-4": 0.84,
+      "DeepSeek-V3": 0.95,
+      "PaLM2": 0.64,
+      "Average": 0.67,
+      "Baseline": 0.79
+    },
+    "Adult Content": {
+      "Vicuna": 0.78,
+      "ChatGLM3": 0.70,
+      "Llama2": 0.48,
+      "Llama3": 0.37,
+      "Llama3.1": 0.38,
+      "GPT-3.5": 0.83,
+      "GPT-4": 0.83,
+      "DeepSeek-V3": 0.90,
+      "PaLM2": 0.51,
+      "Average": 0.64,
+      "Baseline": 0.83
+    },
+    "Political Activities": {
+      "Vicuna": 0.78,
+      "ChatGLM3": 0.77,
+      "Llama2": 0.58,
+      "Llama3": 0.43,
+      "Llama3.1": 0.44,
+      "GPT-3.5": 0.85,
+      "GPT-4": 0.89,
+      "DeepSeek-V3": 0.98,
+      "PaLM2": 0.61,
+      "Average": 0.70,
+      "Baseline": 0.86
+    },
+    "Impersonation": {
+      "Vicuna": 0.71,
+      "ChatGLM3": 0.68,
+      "Llama2": 0.49,
+      "Llama3": 0.43,
+      "Llama3.1": 0.36,
+      "GPT-3.5": 0.73,
+      "GPT-4": 0.85,
+      "DeepSeek-V3": 0.92,
+      "PaLM2": 0.60,
+      "Average": 0.64,
+      "Baseline": 0.88
+    },
+    "AI Usage Disclosure": {
+      "Vicuna": 0.79,
+      "ChatGLM3": 0.75,
+      "Llama2": 0.56,
+      "Llama3": 0.42,
+      "Llama3.1": 0.41,
+      "GPT-3.5": 0.81,
+      "GPT-4": 0.85,
+      "DeepSeek-V3": 0.88,
+      "PaLM2": 0.55,
+      "Average": 0.67,
+      "Baseline": 0.94
+    }
+  }
+}
