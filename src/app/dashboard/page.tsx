@@ -69,7 +69,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadAndCategorizeData() {
       try {
-        const res = await fetch("/data/final_results.json");
+        const res = await fetch("/data/converted_dataset.json");
         const rows: Row[] = await res.json();
         
         setCategorizing(true);
@@ -121,8 +121,11 @@ export default function DashboardPage() {
       }`}>
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-black dark:text-white">
-            Red Teaming Evaluation Results
+            Jailbreak Dataset Analysis
           </CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">
+            Analysis of 537 multi-turn jailbreak prompts from MHJ dataset
+          </p>
         </CardHeader>
         <CardContent>
           {categorizing && (
@@ -178,7 +181,7 @@ export default function DashboardPage() {
         isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`} style={{ transitionDelay: '200ms' }}>
         <CardHeader>
-          <CardTitle>Detailed Results</CardTitle>
+          <CardTitle>Jailbreak Prompts Analysis</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -195,6 +198,13 @@ export default function DashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {data.length === 0 && !categorizing && (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                    No jailbreak prompts loaded. Please check if the dataset is available.
+                  </TableCell>
+                </TableRow>
+              )}
               {data.map((row, i) => (
                 <TableRow 
                   key={i}
