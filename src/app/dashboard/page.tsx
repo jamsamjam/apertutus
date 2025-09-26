@@ -444,7 +444,7 @@ export default function DashboardPage() {
             
             <CategoryPerformanceChart 
               evaluationResults={evaluationResults}
-              selectedModels={[selectedModel, 'GPT-3.5', 'Llama3.1']}
+              selectedModels={Array.from(new Set([selectedModel, 'GPT-3.5', 'Llama3.1']))}
             />
           </div>
         </>
