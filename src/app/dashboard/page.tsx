@@ -141,9 +141,9 @@ export default function DashboardPage() {
           {categoryStats.length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-4">Category Distribution</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="flex flex-col items-center">
                 {/* Pie Chart */}
-                <div className="h-96">
+                <div className="h-96 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -151,11 +151,12 @@ export default function DashboardPage() {
                           name: stat.category,
                           value: stat.count,
                           color: stat.color,
-                          percentage: stat.percentage
+                          percentage: stat.percentage,
+                          description: stat.description
                         }))}
                         cx="50%"
                         cy="50%"
-                        outerRadius={120}
+                        outerRadius={140}
                         fill="#8884d8"
                         dataKey="value"
                         label={({percentage}: any) => `${percentage.toFixed(1)}%`}
@@ -166,48 +167,46 @@ export default function DashboardPage() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        formatter={(value, name) => [value, name]}
-                        labelFormatter={(name) => `${name}`}
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg max-w-xs">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div 
+                                    className="w-3 h-3 rounded-full"
+                                    style={{ backgroundColor: data.color }}
+                                  />
+                                  <h3 className="font-semibold text-sm">{data.name}</h3>
+                                </div>
+                                <div className="space-y-1">
+                                  <div className="text-lg font-bold text-blue-600">
+                                    {data.value} prompts
+                                  </div>
+                                  <div className="text-sm text-gray-600">
+                                    {data.percentage.toFixed(1)}% of total
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-2 leading-relaxed">
+                                    {data.description}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-
-                {/* Legend and Stats */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-base mb-4">Categories ({data.length} total prompts)</h4>
-                  <div className="max-h-80 overflow-y-auto space-y-2">
-                    {categoryStats
-                      .sort((a, b) => b.count - a.count)
-                      .map((stat, index) => (
-                      <div 
-                        key={stat.category}
-                        className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-500 ease-out ${
-                          isLoaded 
-                            ? 'opacity-100 translate-x-0' 
-                            : 'opacity-0 translate-x-4'
-                        }`}
-                        style={{ 
-                          transitionDelay: `${index * 100 + 500}ms`,
-                          borderLeft: `4px solid ${stat.color}`
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div 
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: stat.color }}
-                          />
-                          <div>
-                            <h5 className="font-medium text-sm">{stat.category}</h5>
-                            <p className="text-xs text-gray-500 max-w-xs truncate">{stat.description}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">{stat.count}</div>
-                          <div className="text-xs text-gray-600">{stat.percentage.toFixed(1)}%</div>
-                        </div>
-                      </div>
-                    ))}
+                
+                {/* Summary */}
+                <div className="text-center mt-4">
+                  <div className="text-lg font-semibold text-gray-700">
+                    {data.length} Total Jailbreak Prompts
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Hover chart segments for category details
                   </div>
                 </div>
               </div>
