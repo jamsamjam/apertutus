@@ -27,23 +27,23 @@ export default function ModelComparisonTable({ evaluationResults, selectedModel 
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Model Comparison: Our Results vs {selectedModel}</CardTitle>
-        <p className="text-sm text-muted-foreground">
+    <div>
+      <div className="mb-6">
+        <h3 className="text-2xl font-bold text-white mb-2">Model Comparison: Our Results vs {selectedModel}</h3>
+        <p className="text-white/70 text-sm">
           Attack Success Rate (ASR) comparison across violation categories. Lower scores indicate better safety.
         </p>
-      </CardHeader>
-      <CardContent>
+      </div>
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[200px]">Category</TableHead>
-              <TableHead className="text-right">Our ASR</TableHead>
-              <TableHead className="text-right">{selectedModel} ASR</TableHead>
-              <TableHead className="text-right">Benchmark Avg</TableHead>
-              <TableHead className="text-right">Baseline</TableHead>
-              <TableHead>Performance</TableHead>
+            <TableRow className="border-white/20">
+              <TableHead className="w-[200px] text-white font-semibold">Category</TableHead>
+              <TableHead className="text-right text-white font-semibold">Our ASR</TableHead>
+              <TableHead className="text-right text-white font-semibold">{selectedModel} ASR</TableHead>
+              <TableHead className="text-right text-white font-semibold">Benchmark Avg</TableHead>
+              <TableHead className="text-right text-white font-semibold">Baseline</TableHead>
+              <TableHead className="text-white font-semibold">Performance</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -54,8 +54,8 @@ export default function ModelComparisonTable({ evaluationResults, selectedModel 
                                 difference > 0 ? 'better' : 'worse';
               
               return (
-                <TableRow key={result.category}>
-                  <TableCell className="font-medium">
+                <TableRow key={result.category} className="border-white/10 hover:bg-white/5 transition-colors">
+                  <TableCell className="font-medium text-white/90">
                     <div className="flex items-center gap-2">
                       <div 
                         className="w-3 h-3 rounded-full"
@@ -64,16 +64,16 @@ export default function ModelComparisonTable({ evaluationResults, selectedModel 
                       <span className="text-sm">{result.category}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right font-mono text-white/90">
                     {formatScore(result.asr)}
                   </TableCell>
-                  <TableCell className="text-right font-mono">
+                  <TableCell className="text-right font-mono text-white/90">
                     {formatScore(benchmarkScore)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-right font-mono text-white/60">
                     {formatScore(result.benchmarkComparison.benchmarkAverage)}
                   </TableCell>
-                  <TableCell className="text-right font-mono text-muted-foreground">
+                  <TableCell className="text-right font-mono text-white/60">
                     {formatScore(result.benchmarkComparison.benchmarkBaseline)}
                   </TableCell>
                   <TableCell>
@@ -84,7 +84,7 @@ export default function ModelComparisonTable({ evaluationResults, selectedModel 
             })}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -37,14 +37,14 @@ export default function CategoryPerformanceChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 border rounded shadow-lg">
-          <p className="font-medium">{data.fullCategory}</p>
+        <div className="bg-gray-800/90 backdrop-blur-sm p-3 border border-white/20 rounded-lg shadow-lg">
+          <p className="font-medium text-white">{data.fullCategory}</p>
           <div className="space-y-1 mt-2">
-            <p className="text-blue-600">Our Score: {data.ourScore.toFixed(1)}%</p>
-            <p className="text-gray-600">Benchmark Avg: {data.benchmarkAvg.toFixed(1)}%</p>
+            <p className="text-blue-400">Our Score: {data.ourScore.toFixed(1)}%</p>
+            <p className="text-gray-300">Benchmark Avg: {data.benchmarkAvg.toFixed(1)}%</p>
             <p className="text-gray-400">Baseline: {data.baseline.toFixed(1)}%</p>
             {selectedModels.map(model => (
-              <p key={model} className="text-purple-600">
+              <p key={model} className="text-purple-400">
                 {model}: {data[model].toFixed(1)}%
               </p>
             ))}
@@ -58,29 +58,31 @@ export default function CategoryPerformanceChart({
   return (
     <div className="space-y-6">
       {/* Bar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Attack Success Rate by Category</CardTitle>
-          <p className="text-sm text-muted-foreground">
+      <div>
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-white mb-2">Attack Success Rate by Category</h3>
+          <p className="text-white/70 text-sm">
             Comparison of our model performance vs benchmark models (lower is better for safety)
           </p>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4">
           <ResponsiveContainer width="100%" height={500}>
             <BarChart
               data={chartData}
               margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis 
                 dataKey="category" 
                 angle={-45}
                 textAnchor="end"
                 height={120}
                 fontSize={12}
+                stroke="rgba(255,255,255,0.7)"
               />
               <YAxis 
-                label={{ value: 'Attack Success Rate (%)', angle: -90, position: 'insideLeft' }}
+                label={{ value: 'Attack Success Rate (%)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: 'rgba(255,255,255,0.7)' } }}
+                stroke="rgba(255,255,255,0.7)"
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -96,33 +98,35 @@ export default function CategoryPerformanceChart({
               ))}
             </BarChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Line Chart for trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Performance Trend Across Categories</CardTitle>
-          <p className="text-sm text-muted-foreground">
+      <div>
+        <div className="mb-6">
+          <h3 className="text-2xl font-bold text-white mb-2">Performance Trend Across Categories</h3>
+          <p className="text-white/70 text-sm">
             Line chart showing how different models perform across violation categories
           </p>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4">
           <ResponsiveContainer width="100%" height={400}>
             <LineChart
               data={chartData}
               margin={{ top: 20, right: 30, left: 20, bottom: 100 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis 
                 dataKey="category"
                 angle={-45}
                 textAnchor="end"
                 height={120}
                 fontSize={12}
+                stroke="rgba(255,255,255,0.7)"
               />
               <YAxis 
-                label={{ value: 'Attack Success Rate (%)', angle: -90, position: 'insideLeft' }}
+                label={{ value: 'Attack Success Rate (%)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: 'rgba(255,255,255,0.7)' } }}
+                stroke="rgba(255,255,255,0.7)"
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -156,8 +160,8 @@ export default function CategoryPerformanceChart({
               ))}
             </LineChart>
           </ResponsiveContainer>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
