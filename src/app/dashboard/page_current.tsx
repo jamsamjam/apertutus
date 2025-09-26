@@ -24,6 +24,7 @@ import { evaluateDataset, getPerformanceSummary } from "@/lib/evaluation";
 import ModelComparisonTable from "@/components/ModelComparisonTable";
 import CategoryPerformanceChart from "@/components/CategoryPerformanceChart";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Row = {
   custom_id: string;
@@ -128,15 +129,23 @@ export default function DashboardPage() {
             Analysis of 537 multi-turn jailbreak prompts from MHJ dataset
           </p>
         </CardHeader>
+        
         <CardContent>
-          {categorizing && (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-sm text-gray-600">Categorizing prompts...</p>
-              </div>
-            </div>
-          )}
+          <Tabs defaultValue="dataset" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="dataset">Dataset Analysis</TabsTrigger>
+              <TabsTrigger value="performance">Performance Comparison</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dataset" className="space-y-6 mt-6">
+              {categorizing && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">Categorizing prompts...</p>
+                  </div>
+                </div>
+              )}
           
           {categoryStats.length > 0 && (
             <div className="mb-8">
@@ -212,20 +221,14 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card className={`transition-all duration-700 ease-out ${
-        isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-      }`} style={{ transitionDelay: '200ms' }}>
-        <CardHeader>
-          <CardTitle>Top 10 Jailbreak Prompts</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Showing highest scoring jailbreak attempts (sorted by final score)
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Table>
+          
+          {/* Top 10 Jailbreak Prompts */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold mb-4">Top 10 Jailbreak Prompts</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Showing highest scoring jailbreak attempts (sorted by final score)
+            </p>
+            <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Rank</TableHead>
@@ -375,13 +378,14 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Model Comparison Section */}
-      {evaluationResults.length > 0 && (
-        <>
-          <Card>
+          </div>
+            </TabsContent>
+        
+        <TabsContent value="performance" className="space-y-6 mt-6">
+          {evaluationResults.length > 0 ? (
+            <div className="space-y-6">
+              {/* Performance Summary */}
+              <Card>
             <CardHeader>
               <CardTitle>Performance Summary</CardTitle>
             </CardHeader>
@@ -444,11 +448,20 @@ export default function DashboardPage() {
             
             <CategoryPerformanceChart 
               evaluationResults={evaluationResults}
-              selectedModels={[selectedModel, 'GPT-3.5', 'Llama3.1']}
+              selectedModels={Array.from(new Set([selectedModel, 'GPT-3.5', 'Llama3.1']))}
             />
-          </div>
-        </>
-      )}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No evaluation results available yet.</p>
+              <p className="text-sm mt-2">Please wait for the dataset analysis to complete.</p>
+            </div>
+          )}
+        </TabsContent>
+        
+        </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 }
