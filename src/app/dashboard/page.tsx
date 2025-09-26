@@ -23,6 +23,7 @@ import { JAILBREAK_CATEGORIES, JailbreakCategory, getCategoryStats } from "@/lib
 import { evaluateDataset, getPerformanceSummary } from "@/lib/evaluation";
 import ModelComparisonTable from "@/components/ModelComparisonTable";
 import CategoryPerformanceChart from "@/components/CategoryPerformanceChart";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 type Row = {
   custom_id: string;
@@ -140,37 +141,75 @@ export default function DashboardPage() {
           {categoryStats.length > 0 && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-4">Category Distribution</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoryStats.map((stat, index) => (
-                  <Card 
-                    key={stat.category}
-                    className={`p-4 transition-all duration-500 ease-out ${
-                      isLoaded 
-                        ? 'opacity-100 translate-y-0' 
-                        : 'opacity-0 translate-y-4'
-                    }`}
-                    style={{ 
-                      transitionDelay: `${index * 100 + 500}ms`,
-                      borderLeft: `4px solid ${stat.color}`
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium text-sm">{stat.category}</h4>
-                      <span className="text-lg font-bold">{stat.count}</span>
-                    </div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <AnimatedProgress
-                        value={isLoaded ? stat.percentage : 0}
-                        className="flex-1"
-                        delay={index * 100 + 800}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Pie Chart */}
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryStats.map(stat => ({
+                          name: stat.category,
+                          value: stat.count,
+                          color: stat.color,
+                          percentage: stat.percentage
+                        }))}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={({percentage}: any) => `${percentage.toFixed(1)}%`}
+                        labelLine={false}
+                      >
+                        {categoryStats.map((stat, index) => (
+                          <Cell key={`cell-${index}`} fill={stat.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value, name) => [value, name]}
+                        labelFormatter={(name) => `${name}`}
                       />
-                      <span className="text-xs text-gray-600">
-                        {stat.percentage.toFixed(1)}%
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500">{stat.description}</p>
-                  </Card>
-                ))}
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Legend and Stats */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-base mb-4">Categories ({data.length} total prompts)</h4>
+                  <div className="max-h-80 overflow-y-auto space-y-2">
+                    {categoryStats
+                      .sort((a, b) => b.count - a.count)
+                      .map((stat, index) => (
+                      <div 
+                        key={stat.category}
+                        className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-500 ease-out ${
+                          isLoaded 
+                            ? 'opacity-100 translate-x-0' 
+                            : 'opacity-0 translate-x-4'
+                        }`}
+                        style={{ 
+                          transitionDelay: `${index * 100 + 500}ms`,
+                          borderLeft: `4px solid ${stat.color}`
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div 
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: stat.color }}
+                          />
+                          <div>
+                            <h5 className="font-medium text-sm">{stat.category}</h5>
+                            <p className="text-xs text-gray-500 max-w-xs truncate">{stat.description}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold">{stat.count}</div>
+                          <div className="text-xs text-gray-600">{stat.percentage.toFixed(1)}%</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -181,12 +220,16 @@ export default function DashboardPage() {
         isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`} style={{ transitionDelay: '200ms' }}>
         <CardHeader>
-          <CardTitle>Jailbreak Prompts Analysis</CardTitle>
+          <CardTitle>Top 10 Jailbreak Prompts</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Showing highest scoring jailbreak attempts (sorted by final score)
+          </p>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Rank</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Question</TableHead>
@@ -200,12 +243,15 @@ export default function DashboardPage() {
             <TableBody>
               {data.length === 0 && !categorizing && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     No jailbreak prompts loaded. Please check if the dataset is available.
                   </TableCell>
                 </TableRow>
               )}
-              {data.map((row, i) => (
+              {data
+                .sort((a, b) => b.final_score - a.final_score)
+                .slice(0, 10)
+                .map((row, i) => (
                 <TableRow 
                   key={i}
                   className={`transition-all duration-500 ease-out ${
@@ -217,6 +263,7 @@ export default function DashboardPage() {
                     transitionDelay: `${i * 50}ms` 
                   }}
                 >
+                  <TableCell className="font-bold text-blue-600">#{i + 1}</TableCell>
                   <TableCell>{row.custom_id}</TableCell>
                   <TableCell>
                     {row.category && (
@@ -318,6 +365,17 @@ export default function DashboardPage() {
               ))}
             </TableBody>
           </Table>
+          
+          {data.length > 10 && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>Showing top 10 of {data.length} total jailbreak prompts</span>
+                <span>
+                  Highest score: {data.length > 0 ? Math.max(...data.map(d => d.final_score)).toFixed(3) : '0.000'}
+                </span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
