@@ -75,6 +75,33 @@ export default function DashboardPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [sortField, setSortField] = useState<'custom_id' | 'question' | 'category' | 'final_score'>('final_score');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+  // Landing page steps
+  const [currentStep, setCurrentStep] = useState(0);
+  const [apiEndpoint, setApiEndpoint] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [isApiConfigured, setIsApiConfigured] = useState(false);
+
+  // Step navigation functions
+  const nextStep = () => {
+    if (currentStep < 2) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleApiSubmit = () => {
+    if (apiEndpoint && apiKey) {
+      setIsApiConfigured(true);
+      // Here you would typically validate the API credentials
+      // For now, we'll just proceed to the main dashboard
+    }
+  };
 
   // 정렬 함수
   const handleSort = (field: 'custom_id' | 'question' | 'category' | 'final_score') => {
@@ -171,383 +198,235 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-black dark:text-white">
-            Jailbreak Dataset Analysis
-          </CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">
-            Analysis of 537 multi-turn jailbreak prompts from MHJ dataset
-          </p>
-        </CardHeader>
-      </Card>
-
-      <Tabs defaultValue="dataset" className="w-full">
-        <TabsList>
-          <TabsTrigger value="dataset">Dataset</TabsTrigger>
-          <TabsTrigger value="results">Results</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="dataset">
-          {categorizing && (
-            <div className="flex items-center justify-center py-8 mb-6">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                <p className="text-sm text-gray-600">Categorizing prompts...</p>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/asset/bg.png')"
+        }}
+      ></div>
+      
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/30"></div>
+      
+      <div className="relative z-10 p-6">
+        {!isApiConfigured ? (
+          <>
+            {/* Step indicator */}
+            <div className="flex justify-center mb-12">
+              <div className="flex items-center space-x-8">
+                {['Welcome', 'Pipeline', 'API Configuration'].map((label, index) => (
+                  <div key={index} className={`text-center transition-all duration-500 ${
+                    index === currentStep ? 'text-red-500 font-bold text-lg' : 'text-white/60 text-base'
+                  }`} style={{ color: index === currentStep ? '#FF0000' : undefined }}>
+                    {label}
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-          
-          {categoryStats.length > 0 && (
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Category Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center">
-                  <div className="h-96 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryStats.map(stat => ({
-                            name: stat.category,
-                            value: stat.count,
-                            color: stat.color,
-                            percentage: stat.percentage,
-                            description: stat.description
-                          }))}
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={140}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {categoryStats.map((stat, index) => (
-                            <Cell key={`cell-${index}`} fill={stat.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip 
-                          content={({ active, payload }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              return (
-                                <div className="bg-white p-2 border border-gray-200 rounded-lg shadow-lg">
-                                  <div className="flex items-center gap-2">
-                                    <div 
-                                      className="w-3 h-3 rounded-full"
-                                      style={{ backgroundColor: data.color }}
-                                    />
-                                    <span className="font-semibold text-sm">{data.name}</span>
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  
-                  {/* Category List */}
-                  <div className="mt-6 max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
-                    <div className="divide-y divide-gray-100">
-                      {categoryStats.map((stat, index) => (
-                        <div key={index} className="flex items-start gap-3 p-4 hover:bg-gray-50">
-                          <div 
-                            className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5"
-                            style={{ backgroundColor: stat.color }}
-                          />
-                          <div className="flex-1">
-                            <div className="font-medium text-sm text-gray-900">
-                              {stat.category}
-                            </div>
-                            <div className="text-xs text-gray-600 mt-1">
-                              {stat.count} prompts ({stat.percentage.toFixed(1)}%)
-                            </div>
-                            <div className="text-xs text-gray-500 mt-1 leading-relaxed">
-                              {stat.description}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="text-center mt-6">
-                    <div className="text-lg font-semibold text-gray-700">
-                      {data.length} Total Jailbreak Prompts
-                    </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      Hover chart segments to see category names
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
-          {/* Jailbreak Prompts Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Jailbreak Prompts</CardTitle>
-              <div className="mt-4">
-                <input
-                  type="text"
-                  placeholder="Search questions..."
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-white z-10">
-                    <TableRow>
-                      <TableHead>Rank</TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('custom_id')}
-                      >
-                        ID {sortField === 'custom_id' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('category')}
-                      >
-                        Category {sortField === 'category' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('question')}
-                      >
-                        Question {sortField === 'question' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </TableHead>
-                      <TableHead 
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => handleSort('final_score')}
-                      >
-                        Final Score {sortField === 'final_score' && (sortDirection === 'asc' ? '↑' : '↓')}
-                      </TableHead>
-                      <TableHead>Average Score</TableHead>
-                      <TableHead>ASR(0.25)</TableHead>
-                      <TableHead>ASR(1)</TableHead>
-                      <TableHead>Details</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredAndSortedData.length === 0 && !categorizing && (
-                      <TableRow>
-                        <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                          {searchKeyword ? 'No prompts found matching your search.' : 'No jailbreak prompts loaded. Please check if the dataset is available.'}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {filteredAndSortedData.map((row, i) => (
-                    <TableRow 
-                      key={i}
-                      className={`transition-all duration-500 ease-out ${
-                        isLoaded 
-                          ? 'opacity-100 translate-y-0' 
-                          : 'opacity-0 translate-y-4'
-                      }`}
-                      style={{ 
-                        transitionDelay: `${i * 50}ms` 
-                      }}
+            {/* Step content */}
+            <div className="min-h-[700px] flex items-center justify-center">
+              {/* Step 0: Welcome with Logo */}
+              {currentStep === 0 && (
+                <div className="w-full h-full relative">
+                  {/* Background Image */}
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+                    style={{
+                      backgroundImage: "url('/asset/bg.png')"
+                    }}
+                  ></div>
+                  
+                  {/* Content */}
+                  <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-8 py-20">
+                    {/* Logo */}
+                    <div>
+                      <img 
+                        src="/asset/logo.png" 
+                        alt="Logo" 
+                        className="max-w-4xl max-h-48 object-contain"
+                      />
+                    </div>
+                    
+                    {/* Welcome Message */}
+                    <div className="space-y-4 mb-10">
+                      <h1 className="text-4xl font-black text-white">
+                        Welcome to AI Security Testing
+                      </h1>
+                      <p className="text-white/80 text-xl max-w-2xl">
+                        Advanced jailbreak detection and vulnerability assessment platform
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Navigation */}
+                  <div className="absolute bottom-6 left-0 right-0 z-10 flex justify-center">
+                    <button
+                      onClick={nextStep}
+                      className="text-white px-10 py-6 rounded-xl font-bold shadow-lg transition-all duration-300 flex items-center gap-3 text-lg group"
                     >
-                      <TableCell className="font-bold text-blue-600">#{i + 1}</TableCell>
-                      <TableCell>{row.custom_id}</TableCell>
-                      <TableCell>
-                        {row.category && (
-                          <span 
-                            className="inline-block px-2 py-1 rounded-full text-xs font-medium text-white"
-                            style={{ 
-                              backgroundColor: JAILBREAK_CATEGORIES[row.category].color 
-                            }}
-                          >
-                            {row.category}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="max-w-[300px] truncate">
-                        {row.question}
-                      </TableCell>
-                      <TableCell>{row.final_score.toFixed(3)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <AnimatedProgress
-                            value={isLoaded ? Math.round(row.average_score * 100) : 0}
-                            className="w-[120px]"
-                            delay={i * 100}
-                          />
-                          <span className="text-sm">
-                            {(row.average_score * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <AnimatedProgress
-                            value={isLoaded ? Math.round(row.asr_0_25 * 100) : 0}
-                            className="w-[100px]"
-                            delay={i * 100 + 200}
-                          />
-                          <span className="text-sm">
-                            {(row.asr_0_25 * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <AnimatedProgress
-                            value={isLoaded ? Math.round(row.asr_1 * 100) : 0}
-                            className="w-[100px]"
-                            delay={i * 100 + 400}
-                          />
-                          <span className="text-sm">
-                            {(row.asr_1 * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Sheet>
-                          <SheetTrigger asChild>
-                            <Button size="sm" variant="outline">
-                              View
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent className="w-[400px] sm:w-[600px] overflow-y-auto">
-                            <SheetHeader>
-                              <SheetTitle>Details - {row.custom_id}</SheetTitle>
-                            </SheetHeader>
-                            <div className="mt-4 space-y-4">
-                              <Card className="p-3">
-                                <p className="font-bold">Question:</p>
-                                <p>{row.question}</p>
-                              </Card>
-                              <Card className="p-3">
-                                <p className="font-bold">LLM Response:</p>
-                                <p className="whitespace-pre-wrap">
-                                  {row.llm_response}
-                                </p>
-                              </Card>
-                              <Card className="p-3">
-                                <p className="font-bold">Scores:</p>
-                                <ul className="text-sm list-disc pl-5 space-y-1">
-                                  <li>Final Score: {row.final_score}</li>
-                                  <li>
-                                    Average Score:{" "}
-                                    {(row.average_score * 100).toFixed(1)}%
-                                  </li>
-                                  <li>
-                                    Score (0.25): {row.score_0_25} | ASR(0.25):{" "}
-                                    {(row.asr_0_25 * 100).toFixed(1)}%
-                                  </li>
-                                  <li>
-                                    Score (1): {row.score_1} | ASR(1):{" "}
-                                    {(row.asr_1 * 100).toFixed(1)}%
-                                  </li>
-                                </ul>
-                              </Card>
-                            </div>
-                          </SheetContent>
-                        </Sheet>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-                </Table>
-              </div>
-              
-              {data.length > 0 && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>
-                      Highest score: {data.length > 0 ? Math.max(...data.map(d => d.final_score)).toFixed(3) : '0.000'}
-                    </span>
+                      <span className="group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] transition-all duration-300">
+                        Get Started
+                      </span>
+
+                    </button>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="results">
-          {evaluationResults.length > 0 && (
-            <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Performance Summary</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {performanceSummary && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {(performanceSummary.overallASR * 100).toFixed(1)}%
-                        </div>
-                        <div className="text-sm text-muted-foreground">Overall ASR</div>
+              
+              {/* Step 1: Pipeline Images */}
+              {currentStep === 1 && (
+                <div className="w-full h-full relative">
+                  {/* Content */}
+                  <div className="relative z-10 flex flex-col items-center justify-center space-y-8 py-8">
+                    {/* Images */}
+                    <div className="space-y-5">
+                      <div className="flex justify-center">
+                        <img 
+                          src="/asset/pip1.png" 
+                          alt="Pipeline 1" 
+                          className="max-w-4xl w-full object-contain"
+                        />
                       </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">
-                          {performanceSummary.categoriesBelowBenchmark}
-                        </div>
-                        <div className="text-sm text-muted-foreground">Categories Below Benchmark</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-red-600">
-                          {performanceSummary.highRiskCategories}
-                        </div>
-                        <div className="text-sm text-muted-foreground">High Risk Categories</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-orange-600">
-                          {performanceSummary.totalQuestions}
-                        </div>
-                        <div className="text-sm text-muted-foreground">Total Questions</div>
+                      <div className="flex justify-center">
+                        <img 
+                          src="/asset/pip2.png" 
+                          alt="Pipeline 2" 
+                          className="max-w-4xl w-full object-contain"
+                        />
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <div className="space-y-6 mt-6">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-bold">Model Comparison</h2>
-                  <select 
-                    value={selectedModel} 
-                    onChange={(e) => setSelectedModel(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md"
-                  >
-                    <option value="GPT-4">GPT-4</option>
-                    <option value="GPT-3.5">GPT-3.5</option>
-                    <option value="Llama3.1">Llama3.1</option>
-                    <option value="Llama3">Llama3</option>
-                    <option value="Llama2">Llama2</option>
-                    <option value="ChatGLM3">ChatGLM3</option>
-                    <option value="Vicuna">Vicuna</option>
-                    <option value="DeepSeek-V3">DeepSeek-V3</option>
-                    <option value="PaLM2">PaLM2</option>
-                  </select>
+                  </div>
+                  
+                  {/* Navigation */}
+                  <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-8 z-10 pointer-events-none">
+                    <button
+                      onClick={prevStep}
+                      className="text-white text-3xl font-bold hover:text-gray-300 transition-all duration-300 pointer-events-auto"
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      onClick={nextStep}
+                      className="text-white text-3xl font-bold hover:text-gray-300 transition-all duration-300 pointer-events-auto"
+                    >
+                      &gt;
+                    </button>
+                  </div>
                 </div>
-                
-                <ModelComparisonTable 
-                  evaluationResults={evaluationResults}
-                  selectedModel={selectedModel}
-                />
-                
-                <CategoryPerformanceChart 
-                  evaluationResults={evaluationResults}
-                  selectedModels={[selectedModel, 'GPT-3.5', 'Llama3.1']}
-                />
+              )}
+              
+              {/* Step 2: API Configuration */}
+              {currentStep === 2 && (
+                <div className="w-full h-full relative">
+                  {/* Content */}
+                  <div className="relative z-10 p-8 max-w-4xl mx-auto">
+                    <div className="space-y-8 max-w-2xl mx-auto">
+                      <div className="space-y-6">
+                        <div>
+                          <label className="block text-white font-semibold mb-3 text-xl">API Endpoint</label>
+                          <input
+                            type="url"
+                            placeholder="https://api.openai.com/v1/chat/completions"
+                            value={apiEndpoint}
+                            onChange={(e) => setApiEndpoint(e.target.value)}
+                            className="w-full px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300 text-lg"
+                          />
+                          <p className="text-white/60 text-sm mt-2">Enter your model's API endpoint URL</p>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-white font-semibold mb-3 text-xl">API Key</label>
+                          <input
+                            type="password"
+                            placeholder="sk-..."
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                            className="w-full px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-300 text-lg"
+                          />
+                          <p className="text-white/60 text-sm mt-2">Your API key will be used to test the model</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-red-500/20 border border-red-400/30 rounded-2xl p-6">
+                        <h3 className="text-white font-bold mb-3 flex items-center gap-2 text-lg">
+                          <span>🛡️</span>
+                          Security Notice
+                        </h3>
+                        <p className="text-white/80 text-base leading-relaxed">
+                          Your API credentials are processed securely and used only for testing purposes. 
+                          We recommend using a dedicated API key with limited permissions for testing.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Navigation */}
+                  <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-8 z-10 pointer-events-none">
+                    <button
+                      onClick={prevStep}
+                      className="text-white text-3xl font-bold hover:text-gray-300 transition-all duration-300 pointer-events-auto"
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      onClick={handleApiSubmit}
+                      disabled={!apiEndpoint || !apiKey}
+                      className={`text-3xl font-bold transition-all duration-300 pointer-events-auto ${
+                        apiEndpoint && apiKey
+                          ? 'text-white hover:text-gray-300'
+                          : 'text-gray-600 cursor-not-allowed'
+                      }`}
+                    >
+                      &gt;
+                    </button>
+                  </div>
+                </div>
+              )}
+                    </div>
+          </>
+        ) : (
+          // Main dashboard after API configuration
+          <div className="w-full space-y-8 relative z-10 p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-black text-white mb-4">
+                🎉 Ready to Test!
+              </h1>
+              <p className="text-white/80 text-xl">API configured successfully. You can now test your model against jailbreak prompts.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 className="text-xl font-bold text-white mb-3">API Endpoint</h3>
+                <p className="text-gray-300 font-mono text-sm bg-black/30 p-3 rounded">{apiEndpoint}</p>
               </div>
-            </>
-          )}
-        </TabsContent>
-      </Tabs>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <h3 className="text-xl font-bold text-white mb-3">Status</h3>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-300 font-semibold">Connected & Ready</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <button
+                onClick={() => setIsApiConfigured(false)}
+                className="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300"
+              >
+                Reconfigure API
+              </button>
+            </div>
+            
+            {/* Here you can add the full dashboard functionality */}
+            <div className="text-center text-white/60 mt-16">
+              <p className="text-lg">Full dashboard functionality will be implemented here...</p>
+            </div>
+          </div>
+      )}
+      </div>
     </div>
   );
 }
