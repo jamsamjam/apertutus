@@ -1,1 +1,1 @@
-![](categories.png)
+![](public/asset/categories.png)
