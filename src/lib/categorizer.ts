@@ -102,6 +102,8 @@ export type JailbreakCategory = keyof typeof JAILBREAK_CATEGORIES;
 export async function categorizePrompt(prompt: string): Promise<JailbreakCategory> {
   const apiKey = process.env.SWISS_AI_PLATFORM_API_KEY;
   
+  console.log('API Key status:', apiKey ? 'Found' : 'Not found');
+  
   if (!apiKey) {
     console.warn('SWISS_AI_PLATFORM_API_KEY not found, using fallback categorization');
     return fallbackCategorize(prompt);
@@ -109,7 +111,7 @@ export async function categorizePrompt(prompt: string): Promise<JailbreakCategor
 
   const categories = Object.keys(JAILBREAK_CATEGORIES).map(key => {
     const cat = JAILBREAK_CATEGORIES[key as JailbreakCategory];
-    return `${key}: ${cat.description} (예시: ${cat.examples.join(', ')})`;
+    return `${key}: ${cat.description} (Example: ${cat.examples.join(', ')})`;
   }).join('\n');
 
   const systemPrompt = `You are a jailbreak prompt categorizer. Given a prompt, classify it into one of these categories:
@@ -143,11 +145,15 @@ Respond with ONLY the category name (e.g., "Illegal Activities"). Do not include
     const data = await response.json();
     const category = data.choices[0].message.content.trim();
     
+    console.log('✅ API categorization result:', category, 'for prompt:', prompt.substring(0, 50) + '...');
+    
     // Validate category exists
     if (category in JAILBREAK_CATEGORIES) {
+      console.log('✅ Valid category returned by API:', category);
       return category as JailbreakCategory;
     }
     
+    console.log('❌ Invalid category returned by API:', category, '- using fallback');
     return fallbackCategorize(prompt);
   } catch (error) {
     console.error('Error categorizing prompt:', error);
@@ -156,6 +162,7 @@ Respond with ONLY the category name (e.g., "Illegal Activities"). Do not include
 }
 
 function fallbackCategorize(prompt: string): JailbreakCategory {
+  console.log('🔄 Using fallback categorization for prompt:');
   const lowerPrompt = prompt.toLowerCase();
   
   if (lowerPrompt.includes('drug') || lowerPrompt.includes('weapon') || lowerPrompt.includes('kidnap') || 
