@@ -130,11 +130,16 @@ Respond with ONLY the category name (e.g., "Illegal Activities"). Do not include
       body: JSON.stringify({
         model: 'swiss-ai/Apertus-70B',
         messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Categorize this prompt: "${prompt}"` }
-        ],
-        max_tokens: 50,
-        temperature: 0.1
+          { role: 'user', content: `
+            You are a jailbreak prompt categorizer. Given a prompt, classify it into one of these categories:
+
+            ${categories}
+
+            Respond with ONLY the category name (e.g., "Illegal Activities"). Do not include any explanation.
+            Just return the category name, nothing else.
+            Categorize this prompt: "${prompt}"
+            ` }
+        ]
       })
     });
 
